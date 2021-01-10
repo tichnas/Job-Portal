@@ -30,4 +30,41 @@ router.post('/', auth, isRecruiter, validate.createJob, async (req, res) => {
   }
 });
 
+/**
+ * @route         PUT api/jobs/:jobId
+ * @description   Update Job
+ * @access        Recruiter only
+ */
+router.put(
+  '/:jobId',
+  auth,
+  isRecruiter,
+  validate.updateJob,
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) return res.status(400).json(errors);
+
+      const job = await Job.findById(req.params.jobId, 'recruiter');
+
+      if (!job) return res.status(400).json(formatError('No job found'));
+      if (String(job.recruiter) !== req.user.id)
+        return res.status(401).json(formatError('Not the owner of job'));
+
+      const { maxApplications, maxPositions, deadline } = req.body;
+
+      if (maxApplications) job.maxApplications = maxApplications;
+      if (maxPositions) job.maxPositions = maxPositions;
+      if (deadline) job.deadline = deadline;
+
+      await job.save();
+
+      res.json({ success: true });
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).json(formatError('Server Error'));
+    }
+  }
+);
+
 module.exports = router;
