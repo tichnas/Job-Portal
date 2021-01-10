@@ -1,9 +1,7 @@
 const { check, body } = require('express-validator');
 
 module.exports = [
-  check('name', 'Name must contain something').isString().notEmpty({
-    ignore_whitespace: true,
-  }),
+  check('name', 'Name must contain something').isString().trim().notEmpty(),
   check('email', 'Email is invalid').isEmail(),
   check('password', 'Password should be >= 6 characters').isString().isLength({
     min: 6,
@@ -31,7 +29,8 @@ module.exports = [
     .custom(arr => arr.findIndex(e => e.start >= e.end) === -1),
   check('education.*.institution', 'Institution should be a string')
     .isString()
-    .notEmpty({ ignore_whitespace: true }),
+    .trim()
+    .notEmpty(),
   check('education.*.start', 'Start year should be a positive integer')
     .isInt({ min: 0 })
     .toInt(),
