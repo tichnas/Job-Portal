@@ -9,6 +9,9 @@ const validate = require('./validate');
 
 const router = express.Router();
 
+const getToken = ({ id, password }) =>
+  jwt.sign({ id, password }, process.env.SECRET_KEY);
+
 /**
  * @route         POST api/users/register
  * @description   Register User
@@ -21,7 +24,7 @@ router.post('/register', validate.registerUser, async (req, res) => {
 
     const { email, password } = req.body;
 
-    let user = await User.findOne({ email }, '_id');
+    let user = await User.findOne({ email }, 'id');
     if (user) return res.status(400).json(formatError('Email already exists'));
 
     const hashPassword = await bcrypt.hash(password, 10);
@@ -30,15 +33,36 @@ router.post('/register', validate.registerUser, async (req, res) => {
 
     await user.save();
 
-    const payload = {
-      id: user.id,
-      password: hashPassword,
-    };
+    res.json({ token: getToken({ id: user.id, password: hashPassword }) });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json(formatError('Server Error'));
+  }
+});
 
-    jwt.sign(payload, process.env.SECRET_KEY, (err, token) => {
-      if (err) throw err;
-      res.json({ token });
-    });
+/**
+ * @route         POST api/users/login
+ * @description   Login User
+ * @access        Public
+ */
+router.post('/login', validate.loginUser, async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json(errors);
+
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email }, 'id password');
+
+    if (!user)
+      return res.status(401).json(formatError('Invalid Email or Password'));
+
+    const correctPassword = await bcrypt.compare(password, user.password);
+
+    if (!correctPassword)
+      return res.status(401).json(formatError('Invalid Email or Password'));
+
+    res.json({ token: getToken(user) });
   } catch (err) {
     console.error(err.message);
     res.status(500).json(formatError('Server Error'));
