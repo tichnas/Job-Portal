@@ -22,7 +22,6 @@ const auth = async (req, res, next) => {
 
     if (decoded) {
       const user = await User.findById(decoded.id, 'id');
-      console.log(user);
       if (user) {
         req.user = user;
         next();
