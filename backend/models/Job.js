@@ -30,22 +30,6 @@ const JobSchema = mongoose.Schema({
       value: Number,
     },
   ],
-  applicants: [
-    {
-      user,
-      sop: String,
-      status: {
-        type: String,
-        enum: ['U', 'S', 'A', 'R'],
-        /**
-         * U = Under review or Applied
-         * S = Shortlisted
-         * A = Accepted
-         * R = Rejected
-         */
-      },
-    },
-  ],
 });
 
 module.exports = mongoose.model('job', JobSchema);
