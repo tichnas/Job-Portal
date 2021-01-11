@@ -98,10 +98,20 @@ router.put(
       if (applicants.length >= job.maxApplications)
         return res.status(400).json(formatError('Applications full'));
 
-      if (applicants.findIndex(a => String(a.user) === req.user.id) !== -1)
+      const user = req.user.id;
+
+      if (applicants.findIndex(a => String(a.user) === user) !== -1)
         return res.status(400).json(formatError('Already applied'));
 
-      const user = req.user.id;
+      const acceptedApplication = await Application.findOne(
+        { user, status: 'A' },
+        'id'
+      );
+
+      if (acceptedApplication)
+        return res
+          .status(400)
+          .json(formatError('Already accepted for another job'));
 
       const userApplications = await Application.find(
         {
