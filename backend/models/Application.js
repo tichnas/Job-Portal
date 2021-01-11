@@ -24,6 +24,7 @@ const ApplicationSchema = mongoose.Schema({
     type: Date,
     default: Date.now(),
   },
+  joinDate: Date,
 });
 
 module.exports = mongoose.model('application', ApplicationSchema);

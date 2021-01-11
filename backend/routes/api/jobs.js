@@ -139,9 +139,6 @@ router.put(
  */
 router.delete('/:jobId', auth, isRecruiter, async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) return res.status(400).json(errors);
-
     const job = await Job.findOneAndDelete({
       _id: req.params.jobId,
       recruiter: req.user.id,
@@ -158,5 +155,69 @@ router.delete('/:jobId', auth, isRecruiter, async (req, res) => {
     res.status(500).json(formatError('Server Error'));
   }
 });
+
+/**
+ * @route         PUT api/jobs/application/:applicationId/:action(upgrade|reject)
+ * @description   Upgrade the status of application or Reject
+ * @access        Recruiter only
+ */
+router.put(
+  '/application/:applicationId/:action(upgrade|reject)',
+  auth,
+  isRecruiter,
+  async (req, res) => {
+    try {
+      const { applicationId, action } = req.params;
+
+      const application = await Application.findById(
+        applicationId,
+        'status job joinDate user'
+      ).populate({
+        path: 'job',
+        select: 'maxPositions',
+        match: { recruiter: req.user.id },
+      });
+
+      if (!application || !application.job)
+        return res
+          .status(400)
+          .json(formatError('Not authorised or Application not found'));
+
+      if (application.status === 'A' || application.status === 'R')
+        return res
+          .status(400)
+          .json(formatError('Applicant is already accepted/rejected'));
+
+      if (action === 'reject') application.status = 'R';
+
+      if (action == 'upgrade') {
+        if (application.status === 'U') application.status = 'S';
+        else if (application.status === 'S') {
+          const acceptedApplications = await Application.find(
+            { job: application.job.id, status: 'A' },
+            'id'
+          );
+          if (acceptedApplications.length >= application.job.maxPositions)
+            return res.status(400).json(formatError('Positions already full'));
+
+          await Application.updateMany(
+            { user: application.user },
+            { status: 'R' }
+          );
+
+          application.status = 'A';
+          application.joinDate = Date.now();
+        }
+      }
+
+      await application.save();
+
+      return res.json({ success: true });
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).json(formatError('Server Error'));
+    }
+  }
+);
 
 module.exports = router;
