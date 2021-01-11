@@ -101,8 +101,23 @@ router.put(
       if (applicants.findIndex(a => String(a.user) === req.user.id) !== -1)
         return res.status(400).json(formatError('Already applied'));
 
+      const user = req.user.id;
+
+      const userApplications = await Application.find(
+        {
+          user,
+          $or: [{ status: 'U' }, { status: 'S' }],
+        },
+        'id'
+      );
+
+      if (userApplications.length > 10)
+        return res
+          .status(400)
+          .json(formatError('Max 10 Applications can be opened'));
+
       const application = new Application({
-        user: req.user.id,
+        user,
         job: jobId,
         sop: req.body.sop,
       });
