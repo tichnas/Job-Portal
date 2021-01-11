@@ -3,9 +3,11 @@ const { validationResult } = require('express-validator');
 
 const formatError = require('../../utils/formatError');
 const Job = require('../../models/Job');
+const Application = require('../../models/Application');
 const validate = require('./validate');
 const auth = require('../../middleware/auth');
 const isRecruiter = require('../../middleware/isRecruiter');
+const isApplicant = require('../../middleware/isApplicant');
 
 const router = express.Router();
 
@@ -60,6 +62,54 @@ router.put(
       await job.save();
 
       res.json({ success: true });
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).json(formatError('Server Error'));
+    }
+  }
+);
+
+/**
+ * @route         PUT api/jobs/apply
+ * @description   Apply to Job
+ * @access        Applicant only
+ */
+router.put(
+  '/:jobId/apply',
+  auth,
+  isApplicant,
+  validate.applyJob,
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) return res.status(400).json(errors);
+
+      const jobId = req.params.jobId;
+
+      const job = await Job.findById(jobId, 'maxApplications deadline');
+
+      if (!job) return res.status(400).json(formatError('No job found'));
+
+      if (Date.now() > job.deadline)
+        return res.status(400).json(formatError('Deadline Expired'));
+
+      const applicants = await Application.find({ job: jobId }, 'user');
+
+      if (applicants.length >= job.maxApplications)
+        return res.status(400).json(formatError('Applications full'));
+
+      if (applicants.findIndex(a => String(a.user) === req.user.id) !== -1)
+        return res.status(400).json(formatError('Already applied'));
+
+      const application = new Application({
+        user,
+        job: req.params.jobId,
+        sop: req.body.sop,
+      });
+
+      await application.save();
+
+      return res.json({ id: application.id });
     } catch (err) {
       console.error(err.message);
       res.status(500).json(formatError('Server Error'));

@@ -3,4 +3,5 @@ module.exports = {
   loginUser: require('./loginUser'),
   createJob: require('./createJob'),
   updateJob: require('./updateJob'),
+  applyJob: require('./applyJob'),
 };
