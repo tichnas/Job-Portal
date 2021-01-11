@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const { user } = require('./common');
+const Application = require('./Application');
 
 const JobSchema = mongoose.Schema({
   title: String,
@@ -30,6 +31,15 @@ const JobSchema = mongoose.Schema({
       value: Number,
     },
   ],
+});
+
+JobSchema.post('findOneAndDelete', async (job, next) => {
+  try {
+    await Application.deleteMany({ job: job.id });
+    next();
+  } catch (err) {
+    next(err);
+  }
 });
 
 module.exports = mongoose.model('job', JobSchema);

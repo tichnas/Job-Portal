@@ -102,8 +102,8 @@ router.put(
         return res.status(400).json(formatError('Already applied'));
 
       const application = new Application({
-        user,
-        job: req.params.jobId,
+        user: req.user.id,
+        job: jobId,
         sop: req.body.sop,
       });
 
@@ -127,13 +127,10 @@ router.delete('/:jobId', auth, isRecruiter, async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json(errors);
 
-    const job = await Job.findOneAndDelete(
-      {
-        _id: req.params.jobId,
-        recruiter: req.user.id,
-      },
-      'id'
-    );
+    const job = await Job.findOneAndDelete({
+      _id: req.params.jobId,
+      recruiter: req.user.id,
+    });
 
     if (!job)
       return res
