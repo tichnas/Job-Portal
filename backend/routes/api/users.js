@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const formatError = require('../../utils/formatError');
 const { User } = require('../../models/User');
 const validate = require('./validate');
+const auth = require('../../middleware/auth');
 
 const router = express.Router();
 
@@ -63,6 +64,41 @@ router.post('/login', validate.loginUser, async (req, res) => {
       return res.status(401).json(formatError('Invalid Email or Password'));
 
     res.json({ token: getToken(user) });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json(formatError('Server Error'));
+  }
+});
+
+/**
+ * @route         PUT api/users/
+ * @description   Update User
+ * @access        Private
+ */
+router.put('/', auth, validate.updateUser, async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json(errors);
+
+    const possibleUpdates = [
+      'name',
+      'phone',
+      'bio',
+      'education',
+      'skills',
+      'resume',
+      'photo',
+    ];
+
+    const user = await User.findById(req.user.id);
+
+    possibleUpdates.forEach(p => {
+      if (req.body[p]) user[p] = req.body[p];
+    });
+
+    await user.save();
+
+    res.json({ success: true });
   } catch (err) {
     console.error(err.message);
     res.status(500).json(formatError('Server Error'));
