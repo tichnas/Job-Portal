@@ -1,10 +1,14 @@
 import React from 'react';
 import { AppBar, Toolbar, Box } from '@material-ui/core';
 import { Link } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+
+import { logout } from '../store';
 
 const Navbar = () => {
-  const loggedIn = true;
-  const role = 'applicant';
+  const dispatch = useDispatch();
+  const loggedIn = useSelector(state => state.loggedIn);
+  const role = useSelector(state => state.role);
 
   if (!loggedIn) return null;
 
@@ -34,7 +38,7 @@ const Navbar = () => {
           <Link to='/profile'>Profile</Link>
         </Box>
         <Box m={2}>
-          <Link onClick={() => console.log('Logout')}>Logout</Link>
+          <Link onClick={() => dispatch(logout())}>Logout</Link>
         </Box>
       </Toolbar>
     </AppBar>

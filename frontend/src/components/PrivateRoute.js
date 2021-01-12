@@ -1,9 +1,10 @@
 import React from 'react';
 import { Route, Redirect } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const PrivateRoute = ({ component: Component, role, ...rest }) => {
-  const loggedIn = true;
-  const myRole = 'applicant';
+  const loggedIn = useSelector(state => state.loggedIn);
+  const myRole = useSelector(state => state.role);
 
   return (
     <Route
