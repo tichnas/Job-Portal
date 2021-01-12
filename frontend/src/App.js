@@ -1,5 +1,12 @@
 import React from 'react';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
 
-const App = () => <h1>Job Application Portal</h1>;
+import Navbar from './components/Navbar';
+
+const App = () => (
+  <Router>
+    <Navbar />
+  </Router>
+);
 
 export default App;
