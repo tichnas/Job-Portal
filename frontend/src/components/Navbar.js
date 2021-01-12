@@ -11,17 +11,24 @@ const Navbar = () => {
   return (
     <AppBar color='transparent'>
       <Toolbar>
-        <Box m={2}>
-          <Link to='/'>Dashboard</Link>
-        </Box>
         {role === 'applicant' ? (
-          <Box m={2}>
-            <Link to='/applications'>My Applications</Link>
-          </Box>
+          <>
+            <Box m={2}>
+              <Link to='/jobs'>Jobs</Link>
+            </Box>
+            <Box m={2}>
+              <Link to='/applications'>My Applications</Link>
+            </Box>
+          </>
         ) : (
-          <Box m={2}>
-            <Link to='/employees'>My Employees</Link>
-          </Box>
+          <>
+            <Box m={2}>
+              <Link to='/myjobs'>My Jobs</Link>
+            </Box>
+            <Box m={2}>
+              <Link to='/employees'>My Employees</Link>
+            </Box>
+          </>
         )}
         <Box m={2}>
           <Link to='/profile'>Profile</Link>
