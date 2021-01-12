@@ -17,6 +17,14 @@ export default {
       throw err.response.data;
     }
   },
+  async put(url, payload) {
+    try {
+      const res = await axios.put(url, payload);
+      return res.data;
+    } catch (err) {
+      throw err.response.data;
+    }
+  },
   async delete(url) {
     try {
       const res = await axios.delete(url);

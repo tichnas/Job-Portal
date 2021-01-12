@@ -103,7 +103,7 @@ const ProfileHandler = ({ role, initialState, onSubmit, submitText }) => {
               <CardContent>
                 <p>{e.institution}</p>
                 <p>
-                  {e.start} to {e.end}
+                  {e.start} to {e.end ? e.end : 'current'}
                 </p>
               </CardContent>
               <CardActions>
