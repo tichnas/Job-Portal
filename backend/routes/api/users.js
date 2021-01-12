@@ -38,7 +38,10 @@ router.post('/register', validate.registerUser, async (req, res) => {
 
     await user.save();
 
-    res.json({ token: getToken({ id: user.id, password: hashPassword }) });
+    res.json({
+      token: getToken({ id: user.id, password: hashPassword }),
+      role: user.role,
+    });
   } catch (err) {
     console.error(err.message);
     res.status(500).json(formatError('Server Error'));
@@ -67,7 +70,7 @@ router.post('/login', validate.loginUser, async (req, res) => {
     if (!correctPassword)
       return res.status(401).json(formatError('Invalid Email or Password'));
 
-    res.json({ token: getToken(user) });
+    res.json({ token: getToken(user), role: user.role });
   } catch (err) {
     console.error(err.message);
     res.status(500).json(formatError('Server Error'));
