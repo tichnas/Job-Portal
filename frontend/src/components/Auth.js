@@ -20,6 +20,9 @@ const Auth = () => {
   const dispatch = useDispatch();
   const [tab, setTab] = useState(0);
   const [data, setData] = useState({
+    email: '',
+    password: '',
+    name: '',
     role: 'applicant',
     skills: [],
     education: [],

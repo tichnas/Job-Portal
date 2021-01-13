@@ -19,14 +19,6 @@ module.exports = [
     .isString()
     .trim()
     .custom(bio => bio.split(' ').filter(w => w != '').length <= 250),
-  check(
-    'education',
-    'Educations must be an array with every start year < end year'
-  )
-    .if(body('role').equals('applicant'))
-    .isArray()
-    .bail()
-    .custom(arr => arr.findIndex(e => e.start >= e.end) === -1),
   check('education.*.institution', 'Institution should be a string')
     .isString()
     .trim()
@@ -38,6 +30,14 @@ module.exports = [
     .isInt()
     .toInt()
     .optional(),
+  check(
+    'education',
+    'Educations must be an array with every start year < end year'
+  )
+    .if(body('role').equals('applicant'))
+    .isArray()
+    .bail()
+    .custom(arr => arr.findIndex(e => e.start >= e.end) === -1),
   check('skills', 'Skills must be an array')
     .if(body('role').equals('applicant'))
     .isArray(),

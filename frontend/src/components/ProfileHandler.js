@@ -149,11 +149,7 @@ const ProfileHandler = ({ role, initialState, onSubmit, submitText }) => {
             </CardContent>
             <CardActions>
               <Button
-                disabled={
-                  !newEducation.institution ||
-                  !newEducation.start ||
-                  !newEducation.end
-                }
+                disabled={!newEducation.institution || !newEducation.start}
                 onClick={addEducation}>
                 Add
               </Button>
