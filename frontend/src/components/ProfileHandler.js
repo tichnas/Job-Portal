@@ -7,6 +7,7 @@ import {
   Card,
   CardContent,
   CardActions,
+  Checkbox,
 } from '@material-ui/core';
 
 const ProfileHandler = ({ role, initialState, onSubmit, submitText }) => {
@@ -28,9 +29,12 @@ const ProfileHandler = ({ role, initialState, onSubmit, submitText }) => {
   const handleChange = e =>
     setData(d => ({ ...d, [e.target.name]: e.target.value }));
 
-  const addSkill = () => {
-    setData(d => ({ ...d, skills: [...d.skills, newSkill] }));
-    setNewSkill('');
+  const addSkill = s => {
+    setData(d => ({
+      ...d,
+      skills: [...d.skills, typeof s === 'string' ? s : newSkill],
+    }));
+    if (typeof s !== 'string') setNewSkill('');
   };
 
   const skillDelete = s => {
@@ -51,6 +55,8 @@ const ProfileHandler = ({ role, initialState, onSubmit, submitText }) => {
       ...d,
       education: [...d.education.slice(0, i), ...d.education.slice(i + 1)],
     }));
+
+  const initialSkills = ['HTML', 'CSS', 'JS'];
 
   return (
     <>
@@ -82,9 +88,23 @@ const ProfileHandler = ({ role, initialState, onSubmit, submitText }) => {
         <>
           <br />
           <p>Skills</p>
-          {data.skills.map((s, i) => (
-            <Chip key={i} label={s} onDelete={() => skillDelete(s)} />
+          {initialSkills.map(s => (
+            <div key={s}>
+              <Checkbox
+                checked={data.skills.includes(s)}
+                onChange={e => {
+                  if (e.target.checked) addSkill(s);
+                  else skillDelete(s);
+                }}
+              />
+              <span>{s}</span>
+            </div>
           ))}
+          {data.skills
+            .filter(s => !initialSkills.includes(s))
+            .map((s, i) => (
+              <Chip key={i} label={s} onDelete={() => skillDelete(s)} />
+            ))}
           {data.skills.length ? <br /> : null}
           <TextField
             value={newSkill}
