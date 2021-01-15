@@ -12,7 +12,7 @@ import { useDispatch } from 'react-redux';
 import api from '../../api';
 import { setError } from '../../store';
 
-const ApplyJob = ({ toApply, setToApply }) => {
+const ApplyJob = ({ toApply, setToApply, mutate }) => {
   const dispatch = useDispatch();
   const [SOP, setSOP] = useState('');
   const [loading, setLoading] = useState(false);
@@ -22,6 +22,7 @@ const ApplyJob = ({ toApply, setToApply }) => {
 
     try {
       await api.put(`/api/jobs/${toApply}/apply`, { sop: SOP });
+      await mutate();
       setSOP('');
       setToApply();
     } catch (err) {

@@ -20,7 +20,9 @@ import getColumns from './getColumns';
 
 const ApplicantDashboard = () => {
   const dispatch = useDispatch();
-  const { data, error } = useSWR('get-jobs', () => api.get('/api/jobs'));
+  const { data, error, mutate } = useSWR('get-jobs', () =>
+    api.get('/api/jobs')
+  );
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState('salary');
   const [sortType, setSortType] = useState(1);
@@ -61,7 +63,7 @@ const ApplicantDashboard = () => {
 
   return (
     <>
-      <ApplyJob toApply={toApply} setToApply={setToApply} />
+      <ApplyJob toApply={toApply} setToApply={setToApply} mutate={mutate} />
       <Grid container spacing={1}>
         <Grid item xs={3} />
         <Grid item xs={6}>

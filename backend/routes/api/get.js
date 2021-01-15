@@ -2,6 +2,7 @@ const express = require('express');
 
 const formatError = require('../../utils/formatError');
 const { User } = require('../../models/User');
+const Application = require('../../models/Application');
 const Job = require('../../models/Job');
 const auth = require('../../middleware/auth');
 const isApplicant = require('../../middleware/isApplicant');
@@ -63,6 +64,38 @@ router.get('/jobs', auth, isApplicant, async (req, res) => {
     }));
 
     res.json(formattedJobs);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json(formatError('Server Error'));
+  }
+});
+
+/**
+ * @route         GET api/myapplications
+ * @description   Get My Applications
+ * @access        Applicant only
+ */
+router.get('/myapplications', auth, isApplicant, async (req, res) => {
+  try {
+    const applications = await Application.find({ user: req.user.id })
+      .populate({
+        path: 'job',
+        select: 'title salary recruiter rating',
+        populate: {
+          path: 'recruiter',
+          select: 'name',
+        },
+      })
+      .lean();
+
+    applications.forEach(app => {
+      const index = app.job.rating.findIndex(
+        r => String(r.user) === String(req.user.id)
+      );
+      if (index !== -1) app.job.rated = app.job.rating[index].value;
+    });
+
+    res.json(applications);
   } catch (err) {
     console.error(err.message);
     res.status(500).json(formatError('Server Error'));
