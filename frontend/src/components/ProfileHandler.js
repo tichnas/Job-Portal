@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Container,
   TextField,
   Button,
   Chip,
@@ -9,6 +8,8 @@ import {
   CardActions,
   Checkbox,
 } from '@material-ui/core';
+
+import { initialSkills } from '../constants';
 
 const ProfileHandler = ({ role, initialState, onSubmit, submitText }) => {
   const [data, setData] = useState(initialState);
@@ -55,8 +56,6 @@ const ProfileHandler = ({ role, initialState, onSubmit, submitText }) => {
       ...d,
       education: [...d.education.slice(0, i), ...d.education.slice(i + 1)],
     }));
-
-  const initialSkills = ['HTML', 'CSS', 'JS'];
 
   return (
     <>

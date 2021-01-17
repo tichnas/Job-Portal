@@ -1,4 +1,5 @@
 const express = require('express');
+const ObjectId = require('mongoose').Types.ObjectId;
 
 const formatError = require('../../utils/formatError');
 const { User } = require('../../models/User');
@@ -6,6 +7,7 @@ const Application = require('../../models/Application');
 const Job = require('../../models/Job');
 const auth = require('../../middleware/auth');
 const isApplicant = require('../../middleware/isApplicant');
+const isRecruiter = require('../../middleware/isRecruiter');
 
 const router = express.Router();
 
@@ -96,6 +98,48 @@ router.get('/myapplications', auth, isApplicant, async (req, res) => {
     });
 
     res.json(applications);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json(formatError('Server Error'));
+  }
+});
+
+/**
+ * @route         GET api/myjobs
+ * @description   Get Created Jobs
+ * @access        Recruiter only
+ */
+router.get('/myjobs', auth, isRecruiter, async (req, res) => {
+  try {
+    const jobs = await Job.aggregate([
+      {
+        $lookup: {
+          from: 'applications',
+          localField: '_id',
+          as: 'applications',
+          foreignField: 'job',
+        },
+      },
+      {
+        $match: {
+          recruiter: ObjectId(req.user.id),
+        },
+      },
+      {
+        $project: {
+          title: 1,
+          date: 1,
+          maxPositions: 1,
+          maxApplications: 1,
+          deadline: 1,
+          applications: {
+            status: 1,
+          },
+        },
+      },
+    ]);
+
+    res.json(jobs);
   } catch (err) {
     console.error(err.message);
     res.status(500).json(formatError('Server Error'));
