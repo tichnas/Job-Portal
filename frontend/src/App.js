@@ -11,6 +11,7 @@ import Auth from './components/Auth';
 import Profile from './components/Profile';
 import MyApplications from './components/MyApplications';
 import RecruiterDashboard from './components/RecruiterDashboard';
+import JobApplications from './components/JobApplications';
 import Employees from './components/Employees';
 import ApplicantDashboard from './components/ApplicantDashboard';
 
@@ -38,6 +39,12 @@ const App = () => (
           exact
           path='/myjobs'
           component={RecruiterDashboard}
+        />
+        <PrivateRoute
+          role='recruiter'
+          exact
+          path='/myjobs/:jobId'
+          component={JobApplications}
         />
         <PrivateRoute
           role='recruiter'

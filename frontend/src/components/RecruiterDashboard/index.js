@@ -3,6 +3,7 @@ import { Button } from '@material-ui/core';
 import { DataGrid } from '@material-ui/data-grid';
 import useSWR from 'swr';
 import { useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
 import api from '../../api';
 import { setError } from '../../store';
@@ -11,6 +12,7 @@ import AddJob from './AddJob';
 import getColumns from './getColumns';
 
 const ApplicantDashboard = () => {
+  const history = useHistory();
   const dispatch = useDispatch();
   const { data, error, mutate } = useSWR('get-my-jobs', () =>
     api.get('/api/myjobs')
@@ -51,6 +53,7 @@ const ApplicantDashboard = () => {
         loading={(!data && !error) || loading}
         rows={formattedData}
         columns={getColumns(deleteJob, setToEdit)}
+        onRowClick={({ row }) => history.push(`/myjobs/${row.id}`)}
       />
     </>
   );

@@ -16,3 +16,5 @@ app.use('/api', require('./routes/api/get'));
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => console.log('Server Started'));
+
+// TODO: Invalid object id gives different error from non-existent id

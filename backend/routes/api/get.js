@@ -146,4 +146,30 @@ router.get('/myjobs', auth, isRecruiter, async (req, res) => {
   }
 });
 
+/**
+ * @route         GET api/myjobs/:jobId
+ * @description   Get applications for a job
+ * @access        Recruiter only
+ */
+router.get('/myjobs/:jobId', auth, isRecruiter, async (req, res) => {
+  try {
+    const job = await Job.findById(req.params.jobId, 'recruiter');
+
+    if (!job) return res.status(400).json(formatError('No Job found'));
+
+    if (String(job.recruiter) !== String(req.user.id))
+      return res.status(401).json(formatError('Not the owner of job'));
+
+    const applications = await Application.find({
+      job: req.params.jobId,
+      status: { $ne: 'R' },
+    }).populate('user', 'name skills rating education');
+
+    res.json(applications);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json(formatError('Server Error'));
+  }
+});
+
 module.exports = router;

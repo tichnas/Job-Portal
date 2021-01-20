@@ -14,7 +14,7 @@ import { useDispatch } from 'react-redux';
 
 import api from '../../api';
 import { setError } from '../../store';
-import getRating from './getRating';
+import getRating from '../../utils/getRating';
 import ApplyJob from './ApplyJob';
 import getColumns from './getColumns';
 
@@ -42,7 +42,7 @@ const ApplicantDashboard = () => {
   formattedData = formattedData.sort((a, b) => {
     if (sort === 'salary') return sortType * (a.salary - b.salary);
     if (sort === 'rating')
-      return sortType * (getRating(a.rating) - getRating(b.rating));
+      return sortType * (getRating(a.rating, true) - getRating(b.rating, true));
     if (sort === 'duration')
       return (
         sortType *

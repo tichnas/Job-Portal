@@ -1,5 +1,5 @@
 import { Button } from '@material-ui/core';
-import getRating from './getRating';
+import getRating from '../../utils/getRating';
 
 const getColumns = setToApply => [
   {
@@ -16,10 +16,7 @@ const getColumns = setToApply => [
   {
     field: 'rating',
     headerName: 'Rating',
-    valueFormatter: params => {
-      const reviews = params.value;
-      return `${getRating(reviews)}/5 (${reviews.length})`;
-    },
+    valueFormatter: params => getRating(params.value),
   },
   {
     field: 'salary',
