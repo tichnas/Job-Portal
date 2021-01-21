@@ -19,6 +19,8 @@ const getColumns = rate => [
     headerName: 'Date of Joining',
     width: 150,
     valueFormatter: params => {
+      if (!params.value) return '-';
+
       const d = new Date(params.value);
       return d.toDateString();
     },
