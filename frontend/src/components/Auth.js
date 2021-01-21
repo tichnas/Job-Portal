@@ -96,7 +96,13 @@ const Auth = () => {
             role={data.role}
             initialState={data}
             submitText='Register'
-            onSubmit={newData => submit('register', newData)}
+            onSubmit={newData =>
+              submit('register', {
+                ...newData,
+                email: data.email,
+                password: data.password,
+              })
+            }
           />
         ) : (
           <Button disabled={loading} onClick={() => submit('login', {})}>
