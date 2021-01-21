@@ -8,6 +8,8 @@ const validate = require('./validate');
 const auth = require('../../middleware/auth');
 const isRecruiter = require('../../middleware/isRecruiter');
 const isApplicant = require('../../middleware/isApplicant');
+const { User } = require('../../models/User');
+const sendMail = require('../../utils/sendMail');
 
 const router = express.Router();
 
@@ -182,11 +184,13 @@ router.put(
       const application = await Application.findById(
         applicationId,
         'status job joinDate user'
-      ).populate({
-        path: 'job',
-        select: 'maxPositions',
-        match: { recruiter: req.user.id },
-      });
+      )
+        .populate({
+          path: 'job',
+          select: 'maxPositions title',
+          match: { recruiter: req.user.id },
+        })
+        .populate('user', 'email');
 
       if (!application || !application.job)
         return res
@@ -222,7 +226,20 @@ router.put(
 
       await application.save();
 
-      return res.json({ success: true });
+      // Try to send mail, but don't wait for it
+      res.json({ success: true });
+
+      if (application.status === 'A') {
+        const recruiter = await User.findById(req.user.id, 'name');
+
+        await sendMail(
+          application.user.email,
+          'Application Accepted',
+          `Congratulations!\nYour application for job: ${application.job.title}  by recruiter ${recruiter.name} is accepted.`
+        );
+      }
+
+      return;
     } catch (err) {
       console.error(err.message);
       res.status(500).json(formatError('Server Error'));
