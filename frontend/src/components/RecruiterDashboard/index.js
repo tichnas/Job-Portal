@@ -53,7 +53,10 @@ const ApplicantDashboard = () => {
         loading={(!data && !error) || loading}
         rows={formattedData}
         columns={getColumns(deleteJob, setToEdit)}
-        onRowClick={({ row }) => history.push(`/myjobs/${row.id}`)}
+        onCellClick={({ field, row }) => {
+          if (field !== 'Delete' && field !== 'Edit')
+            history.push(`/myjobs/${row.id}`);
+        }}
       />
     </>
   );
