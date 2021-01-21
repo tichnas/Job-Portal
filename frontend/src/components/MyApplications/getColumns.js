@@ -33,7 +33,9 @@ const getColumns = rate => [
     renderCell: params => {
       if (params.getValue('job').rated)
         return <p>Rated {params.getValue('job').rated}/5</p>;
-      return <Rating setRating={val => rate(params.getValue('job').id, val)} />;
+      return (
+        <Rating setRating={val => rate(params.getValue('job')._id, val)} />
+      );
     },
   },
 ];
