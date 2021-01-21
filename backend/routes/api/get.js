@@ -172,4 +172,39 @@ router.get('/myjobs/:jobId', auth, isRecruiter, async (req, res) => {
   }
 });
 
+/**
+ * @route         GET api/employees
+ * @description   Get current employees
+ * @access        Recruiter only
+ */
+router.get('/employees', auth, isRecruiter, async (req, res) => {
+  try {
+    let applications = await Application.find(
+      { status: 'A' },
+      'user job joinDate'
+    )
+      .populate({
+        path: 'job',
+        match: { recruiter: req.user.id },
+        select: 'title type',
+      })
+      .populate('user', 'name rating')
+      .lean();
+
+    applications = applications.filter(a => a.job);
+
+    applications.forEach(app => {
+      const index = app.user.rating.findIndex(
+        r => String(r.user) === String(req.user.id)
+      );
+      if (index !== -1) app.user.rated = app.user.rating[index].value;
+    });
+
+    res.json(applications);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json(formatError('Server Error'));
+  }
+});
+
 module.exports = router;
