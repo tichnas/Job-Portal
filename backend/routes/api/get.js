@@ -35,6 +35,13 @@ router.get('/jobs', auth, isApplicant, async (req, res) => {
   try {
     const jobs = await Job.aggregate([
       {
+        $match: {
+          deadline: {
+            $gt: new Date(),
+          },
+        },
+      },
+      {
         $lookup: {
           from: 'applications',
           localField: '_id',
