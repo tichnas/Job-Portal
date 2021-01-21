@@ -30,7 +30,7 @@ const ApplicantDashboard = () => {
   const [jobType, setJobType] = useState({ WH: true, PT: true, FT: true });
   const [minSalary, setMinSalary] = useState(0);
   const [maxSalary, setMaxSalary] = useState(9999999);
-  console.log(data);
+  const [maxDuration, setMaxDuration] = useState(7);
 
   if (error && error.errors) dispatch(setError(error.errors[0].msg));
 
@@ -59,7 +59,7 @@ const ApplicantDashboard = () => {
     d => d.salary >= minSalary && d.salary <= maxSalary
   );
 
-  // TODO: filter by duration
+  formattedData = formattedData.filter(d => d.duration < maxDuration);
 
   return (
     <>
@@ -123,7 +123,17 @@ const ApplicantDashboard = () => {
           />
         </Grid>
         <Grid item>
-          <Select></Select>
+          <Select
+            value={maxDuration}
+            onChange={e => setMaxDuration(e.target.value)}>
+            <MenuItem value={1}>Duration &lt; 1</MenuItem>
+            <MenuItem value={2}>Duration &lt; 2</MenuItem>
+            <MenuItem value={3}>Duration &lt; 3</MenuItem>
+            <MenuItem value={4}>Duration &lt; 4</MenuItem>
+            <MenuItem value={5}>Duration &lt; 5</MenuItem>
+            <MenuItem value={6}>Duration &lt; 6</MenuItem>
+            <MenuItem value={7}>Duration &lt; 7</MenuItem>
+          </Select>
         </Grid>
 
         <Grid item xs={12} />
