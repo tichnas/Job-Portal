@@ -20,11 +20,17 @@ const EditJob = ({ toEdit, setToEdit, mutate }) => {
   const save = async () => {
     setLoading(true);
 
+    const formattedDeadline = new Date(
+      Date.parse(toEdit.deadline + 'T' + toEdit.deadlineTime)
+    );
+    formattedDeadline.setHours(formattedDeadline.getHours() + 5);
+    formattedDeadline.setMinutes(formattedDeadline.getMinutes() + 30);
+
     try {
       await api.put(`/api/jobs/${toEdit.id}`, {
         maxApplications: toEdit.maxApplicants,
         maxPositions: toEdit.maxPositions,
-        deadline: Date.parse(toEdit.deadline),
+        deadline: formattedDeadline.valueOf(),
       });
       await mutate();
       setToEdit({});
@@ -40,7 +46,11 @@ const EditJob = ({ toEdit, setToEdit, mutate }) => {
   };
 
   const handleChange = e => {
-    if (e.target.value >= 0)
+    if (
+      e.target.value >= 0 ||
+      e.target.name === 'deadline' ||
+      e.target.name === 'deadlineTime'
+    )
       setToEdit(old => ({ ...old, [e.target.name]: e.target.value }));
   };
 
@@ -78,6 +88,16 @@ const EditJob = ({ toEdit, setToEdit, mutate }) => {
               onChange={handleChange}
               label='Deadline'
               type='date'
+            />
+            <br />
+            <br />
+            <TextField
+              variant='outlined'
+              value={toEdit.deadlineTime}
+              name='deadlineTime'
+              onChange={handleChange}
+              label='Deadline Time'
+              type='time'
             />
             <br />
             <br />

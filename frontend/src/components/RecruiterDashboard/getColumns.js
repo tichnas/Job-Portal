@@ -31,9 +31,15 @@ const getColumns = (deleteJob, setToEdit) => [
   {
     field: 'Edit',
     renderCell: params => {
+      console.log(params.getValue('deadline'));
       const deadline = new Date(params.getValue('deadline'))
         .toISOString()
         .split('T')[0];
+
+      const deadlineTime = new Date(params.getValue('deadline'))
+        .toISOString()
+        .split('T')[1]
+        .slice(0, 5);
 
       return (
         <Button
@@ -43,6 +49,7 @@ const getColumns = (deleteJob, setToEdit) => [
               maxApplicants: params.getValue('maxApplications'),
               maxPositions: params.getValue('maxPositions'),
               deadline,
+              deadlineTime,
             })
           }>
           Edit

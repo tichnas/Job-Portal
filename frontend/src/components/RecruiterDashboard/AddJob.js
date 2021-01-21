@@ -24,6 +24,7 @@ const initialState = {
   maxApplications: 0,
   maxPositions: 0,
   deadline: new Date().toISOString().split('T')[0],
+  deadlineTime: '17:00',
   type: 'FT',
   duration: 1,
   salary: 0,
@@ -44,10 +45,16 @@ const AddJob = ({ toAdd, setToAdd, mutate }) => {
   const save = async () => {
     setLoading(true);
 
+    const formattedDeadline = new Date(
+      Date.parse(data.deadline + 'T' + data.deadlineTime)
+    );
+    formattedDeadline.setHours(formattedDeadline.getHours() + 5);
+    formattedDeadline.setMinutes(formattedDeadline.getMinutes() + 30);
+
     try {
       await api.post(`/api/jobs`, {
         ...data,
-        deadline: Date.parse(data.deadline),
+        deadline: formattedDeadline.valueOf(),
       });
       await mutate();
       cancel();
@@ -59,8 +66,11 @@ const AddJob = ({ toAdd, setToAdd, mutate }) => {
   };
 
   const handleChange = e => {
-    console.log(e.target.value >= 0);
-    if (e.target.value >= 0 || !parseInt(e.target.value))
+    if (
+      e.target.value >= 0 ||
+      e.target.name === 'deadline' ||
+      e.target.name === 'deadlineTime'
+    )
       setData(old => ({ ...old, [e.target.name]: e.target.value }));
   };
 
@@ -111,9 +121,23 @@ const AddJob = ({ toAdd, setToAdd, mutate }) => {
                   value={data.deadline}
                   name='deadline'
                   onChange={handleChange}
-                  label='Deadline'
+                  label='Deadline Date'
                   type='date'
                 />
+                <br />
+                <br />
+                <Select
+                  value={data.duration}
+                  onChange={handleChange}
+                  name='duration'>
+                  <MenuItem value={1}>1 month</MenuItem>
+                  <MenuItem value={2}>2 months</MenuItem>
+                  <MenuItem value={3}>3 months</MenuItem>
+                  <MenuItem value={4}>4 months</MenuItem>
+                  <MenuItem value={5}>5 months</MenuItem>
+                  <MenuItem value={6}>6 months</MenuItem>
+                  <MenuItem value={0}>Indefinite</MenuItem>
+                </Select>
               </Grid>
               <Grid item xs={6}>
                 <TextField
@@ -136,18 +160,14 @@ const AddJob = ({ toAdd, setToAdd, mutate }) => {
                 />
                 <br />
                 <br />
-                <Select
-                  value={data.duration}
+                <TextField
+                  variant='outlined'
+                  value={data.deadlineTime}
+                  name='deadlineTime'
                   onChange={handleChange}
-                  name='duration'>
-                  <MenuItem value={1}>1 month</MenuItem>
-                  <MenuItem value={2}>2 months</MenuItem>
-                  <MenuItem value={3}>3 months</MenuItem>
-                  <MenuItem value={4}>4 months</MenuItem>
-                  <MenuItem value={5}>5 months</MenuItem>
-                  <MenuItem value={6}>6 months</MenuItem>
-                  <MenuItem value={0}>Indefinite</MenuItem>
-                </Select>
+                  label='Deadline Time'
+                  type='time'
+                />
                 <br />
                 <br />
                 <Select value={data.type} onChange={handleChange} name='type'>
