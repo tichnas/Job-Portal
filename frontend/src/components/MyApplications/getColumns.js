@@ -15,6 +15,22 @@ const getColumns = rate => [
     width: 150,
   },
   {
+    field: 'status',
+    headerName: 'Status',
+    valueFormatter: params => {
+      switch (params.value) {
+        case 'U':
+          return 'Applied';
+        case 'S':
+          return 'Shortlisted';
+        case 'A':
+          return 'Accepted';
+        case 'R':
+          return 'Rejected';
+      }
+    },
+  },
+  {
     field: 'joinDate',
     headerName: 'Date of Joining',
     width: 150,
