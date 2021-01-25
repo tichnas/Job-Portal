@@ -219,6 +219,12 @@ router.put(
             { status: 'R' }
           );
 
+          if (acceptedApplications.length + 1 === application.job.maxPositions)
+            await Application.updateMany(
+              { job: application.job.id },
+              { status: 'R' }
+            );
+
           application.status = 'A';
           application.joinDate = Date.now();
         }
