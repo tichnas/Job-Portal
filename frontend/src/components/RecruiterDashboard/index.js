@@ -39,7 +39,11 @@ const ApplicantDashboard = () => {
     setLoading(false);
   };
 
-  const formattedData = (data || []).map(r => ({ ...r, id: r._id }));
+  const formattedData = (data || [])
+    .map(r => ({ ...r, id: r._id }))
+    .filter(
+      r => r.applications.filter(a => a.status === 'A').length < r.maxPositions
+    );
 
   return (
     <>
