@@ -10,7 +10,7 @@ const transport = nodemailer.createTransport({
 
 const sendMail = async (to, subject, text) =>
   transport.sendMail({
-    from: '"Sanchit" <dominodevelopers@outlook.com>',
+    from: '"Sanchit" <tichnas@outlook.com>',
     to,
     subject,
     text,
